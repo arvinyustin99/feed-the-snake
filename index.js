@@ -1,8 +1,8 @@
 let grid = document.querySelector("#root .canvas");
 let popup = document.querySelector(".popup");
 let scoreDisplay = document.querySelector(".score-display");
-let width = 1;
-let currentIndex = 0;
+let width = 10;
+let appleIndex = 0;
 let currentSnake = [2, 1, 0]
 let direction = 1; // -10 = up, 1 = right, 10 = down, -1 = left
 let speed = 0.8;
@@ -32,7 +32,7 @@ function startGame() {
         */
         squares[index].classList.add("snake")
     })
-    randomApple(squares)
+    generateRandomApple(squares)
     interval = setInterval(moveOutcome, intervalTime);
 }
 
@@ -49,6 +49,35 @@ function moveOutcome() {
     moveSnake(squares)
 }
 
+function eatApple(squares, tail) {
+    if (squares[currentSnake[0]].classList.contains("apple")) {
+      squares[currentSnake[0]].classList.remove("apple");
+      squares[tail].classList.add("snake");
+      currentSnake.push(tail);
+      generateRandomApple(squares);
+      //score++;
+      //scoreDisplay.textContent = score;
+      clearInterval(interval);
+      intervalTime = intervalTime * speed;
+      interval = setInterval(moveOutcome, intervalTime);
+    }
+  }
+
+function checkForHits(squares) {
+    if (
+      (currentSnake[0] + width >= width * width && direction === width) ||
+      (currentSnake[0] % width === width - 1 && direction === 1) ||
+      (currentSnake[0] % width === 0 && direction === -1) ||
+      (currentSnake[0] - width <= 0 && direction === -width) ||
+      squares[currentSnake[0] + direction].classList.contains("snake")
+    ) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+  
+
 function moveSnake(pointList) {
     // assume the first index of array is the tail-end
     if (direction === 0) {return}
@@ -56,25 +85,36 @@ function moveSnake(pointList) {
     pointList[tail].classList.remove("snake");
     currentSnake.unshift(currentSnake[0] + direction);
     pointList[currentSnake[0]].classList.add("snake");
+    eatApple(pointList, tail)
     console.log("current pos: ", currentSnake)
 }
 
-function randomApple(squares) {
+function generateRandomApple(squares) {
+    if (appleIndex >= 0) {
+        removeEatenApple(squares);
+    }
     do {
         appleIndex = Math.floor(Math.random() * squares.length)
-    } while (squares[appleIndex].classList.contains("snake"));
+    //} while (squares[appleIndex].classList.contains("snake"));
+    } while (currentSnake.find((val, idx) => {
+        return val === appleIndex;
+    }))
     squares[appleIndex].classList.add("apple");
+}
+
+function removeEatenApple(squares){
+    squares[appleIndex].classList.remove("apple");
 }
 
 function control(e) {
     console.log("key pressed: ", e);
-    if (e.keycode === 39) {
+    if (e.code === "ArrowRight") {
       direction = 1; // right
-    } else if (e.keycode === 38) {
+    } else if (e.code === "ArrowUp") {
       direction = -width; // arrow up
-    } else if (e.keycode === 37) {
+    } else if (e.code === "ArrowLeft") {
       direction = -1; // left, the snake will go left one div
-    } else if (e.keycode === 40) {
+    } else if (e.code === "ArrowDown") {
       direction = +width; // down the snake head will instantly appear 10 divs below from the current div
     } else if (e.key === "Escape") {
         direction = 0;
