@@ -1,10 +1,10 @@
 let grid = document.querySelector("#root .canvas");
 let popup = document.querySelector(".popup");
 let scoreDisplay = document.querySelector(".score-display");
-let width = 10;
+let width = 1;
 let currentIndex = 0;
 let currentSnake = [2, 1, 0]
-let direction = 1; // 1 = up, 2 = right, 3 = down, 4 = left
+let direction = 1; // -10 = up, 1 = right, 10 = down, -1 = left
 let speed = 0.8;
 let interval = 0;
 let intervalTime = 1000;
@@ -13,13 +13,14 @@ document.addEventListener("DOMContentLoaded", function () {
     document.addEventListener("keyup", control);
     createBoard();
     startGame();
+    moveOutcome();
 })
 
 function startGame() {
     let squares = document.querySelectorAll("#root .canvas div")
     direction = 1;
     intervalTime = 1000;
-    currentSnake = [2, 1, 0]
+    currentSnake = [3, 2, 1, 0]
     currentSnake.forEach((index) => {
         // TODO: restrict more in Snake's movement
         /*
@@ -31,6 +32,7 @@ function startGame() {
         */
         squares[index].classList.add("snake")
     })
+    interval = setInterval(moveOutcome, intervalTime);
 }
 
 function createBoard() {
@@ -39,6 +41,20 @@ function createBoard() {
         let gridDiv = document.createElement("div")
         grid.appendChild(gridDiv)
     }
+}
+
+function moveOutcome() {
+    let squares = document.querySelectorAll("#root .canvas div")
+    moveSnake(squares)
+}
+
+function moveSnake(pointList) {
+    // assume the first index of array is the tail-end
+    let tail = currentSnake.pop();
+    pointList[tail].classList.remove("snake");
+    currentSnake.unshift(currentSnake[0] + direction);
+    pointList[currentSnake[0]].classList.add("snake");
+    console.log("current pos: ", currentSnake)
 }
 
 function control(e) {
