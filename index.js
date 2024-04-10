@@ -50,6 +50,7 @@ function moveOutcome() {
 
 function moveSnake(pointList) {
     // assume the first index of array is the tail-end
+    if (direction === 0) {return}
     let tail = currentSnake.pop();
     pointList[tail].classList.remove("snake");
     currentSnake.unshift(currentSnake[0] + direction);
@@ -58,6 +59,7 @@ function moveSnake(pointList) {
 }
 
 function control(e) {
+    console.log("key pressed: ", e);
     if (e.keycode === 39) {
       direction = 1; // right
     } else if (e.keycode === 38) {
@@ -66,5 +68,7 @@ function control(e) {
       direction = -1; // left, the snake will go left one div
     } else if (e.keycode === 40) {
       direction = +width; // down the snake head will instantly appear 10 divs below from the current div
+    } else if (e.key === "Escape") {
+        direction = 0;
     }
   }
