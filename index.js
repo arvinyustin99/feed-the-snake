@@ -32,6 +32,7 @@ function startGame() {
         */
         squares[index].classList.add("snake")
     })
+    randomApple(squares)
     interval = setInterval(moveOutcome, intervalTime);
 }
 
@@ -56,6 +57,13 @@ function moveSnake(pointList) {
     currentSnake.unshift(currentSnake[0] + direction);
     pointList[currentSnake[0]].classList.add("snake");
     console.log("current pos: ", currentSnake)
+}
+
+function randomApple(squares) {
+    do {
+        appleIndex = Math.floor(Math.random() * squares.length)
+    } while (squares[appleIndex].classList.contains("snake"));
+    squares[appleIndex].classList.add("apple");
 }
 
 function control(e) {
