@@ -3,6 +3,7 @@ let popup = document.querySelector(".popup");
 let scoreDisplay = document.querySelector(".score-display");
 let width = 10;
 let appleIndex = 0;
+let score = 0;
 let currentSnake = [2, 1, 0]
 let direction = 1; // -10 = up, 1 = right, 10 = down, -1 = left
 let speed = 0.8;
@@ -93,12 +94,13 @@ function generateRandomApple(squares) {
     if (appleIndex >= 0) {
         removeEatenApple(squares);
     }
+    previousAppleIndex = appleIndex;
     do {
         appleIndex = Math.floor(Math.random() * squares.length)
     //} while (squares[appleIndex].classList.contains("snake"));
     } while (currentSnake.find((val, idx) => {
         return val === appleIndex;
-    }))
+    }) && (appleIndex !== previousAppleIndex))
     squares[appleIndex].classList.add("apple");
 }
 
