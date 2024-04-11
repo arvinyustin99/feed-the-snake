@@ -11,83 +11,100 @@ let interval = 0;
 let intervalTime = 1000;
 
 document.addEventListener("DOMContentLoaded", function () {
-    document.addEventListener("keyup", control);
-    createBoard();
-    startGame();
-    moveOutcome();
+	document.addEventListener("keyup", control);
+	createBoard(width);
+	startGame();
+	moveOutcome();
 })
 
 function startGame() {
-    let squares = document.querySelectorAll("#root .canvas div")
-    direction = 1;
-    intervalTime = 1000;
-    currentSnake = [3, 2, 1, 0]
-    currentSnake.forEach((index) => {
-        // TODO: restrict more in Snake's movement
-        /*
-        if (index === 0) {
-            squares[index].classList.add("head")
-        } else {
-            squares[index].classList.add("snake")
-        }
-        */
-        squares[index].classList.add("snake")
-    })
-    generateRandomApple(squares)
-    interval = setInterval(moveOutcome, intervalTime);
+	let squares = document.querySelectorAll("#root .canvas div")
+	direction = 1;
+	intervalTime = 1000;
+	currentSnake = [3, 2, 1, 0]
+	currentSnake.forEach((index) => {
+		// TODO: restrict more in Snake's movement
+		/*
+		if (index === 0) {
+				squares[index].classList.add("head")
+		} else {
+				squares[index].classList.add("snake")
+		}
+		*/
+		squares[index].classList.add("snake")
+	})
+	generateRandomApple(squares)
+	interval = setInterval(moveOutcome, intervalTime);
 }
 
-function createBoard() {
-    popup.style.display = "none";
-    for (let i = 0; i < 100; i++){
-        let gridDiv = document.createElement("div")
-        grid.appendChild(gridDiv)
-    }
+function createBoard(width) {
+	popup.style.display = "none";
+	for (let i = 0; i < Math.pow(width, 2); i++){
+		let gridDiv = document.createElement("div")
+		grid.appendChild(gridDiv)
+	}
 }
 
 function moveOutcome() {
-    let squares = document.querySelectorAll("#root .canvas div")
-    moveSnake(squares)
+	let squares = document.querySelectorAll("#root .canvas div")
+	moveSnake(squares)
 }
 
 function eatApple(squares, tail) {
-    if (squares[currentSnake[0]].classList.contains("apple")) {
-      squares[currentSnake[0]].classList.remove("apple");
-      squares[tail].classList.add("snake");
-      currentSnake.push(tail);
-      generateRandomApple(squares);
-      //score++;
-      //scoreDisplay.textContent = score;
-      clearInterval(interval);
-      intervalTime = intervalTime * speed;
-      interval = setInterval(moveOutcome, intervalTime);
-    }
-  }
+	if (squares[currentSnake[0]].classList.contains("apple")) {
+		squares[currentSnake[0]].classList.remove("apple");
+		squares[tail].classList.add("snake");
+		currentSnake.push(tail);
+		generateRandomApple(squares);
+		//score++;
+		//scoreDisplay.textContent = score;
+		clearInterval(interval);
+		intervalTime = intervalTime * speed;
+		interval = setInterval(moveOutcome, intervalTime);
+	}
+}
 
 function checkForHits(squares) {
-    if (
-      (currentSnake[0] + width >= width * width && direction === width) ||
-      (currentSnake[0] % width === width - 1 && direction === 1) ||
-      (currentSnake[0] % width === 0 && direction === -1) ||
-      (currentSnake[0] - width <= 0 && direction === -width) ||
-      squares[currentSnake[0] + direction].classList.contains("snake")
-    ) {
-      return true;
-    } else {
-      return false;
-    }
-  }
-  
+	if (
+		(currentSnake[0] + width >= width * width && direction === width) ||
+		(currentSnake[0] % width === width - 1 && direction === 1) ||
+		(currentSnake[0] % width === 0 && direction === -1) ||
+		(currentSnake[0] - width <= 0 && direction === -width) ||
+		squares[currentSnake[0] + direction].classList.contains("snake")
+	) {
+		return true;
+	} else {
+		return false;
+	}
+}
+
+function outOfBound(squares){
+}
 
 function moveSnake(pointList) {
-    // assume the first index of array is the tail-end
-    if (direction === 0) {return}
-    let tail = currentSnake.pop();
-    pointList[tail].classList.remove("snake");
-    currentSnake.unshift(currentSnake[0] + direction);
-    pointList[currentSnake[0]].classList.add("snake");
-    eatApple(pointList, tail)
-    console.log("current pos: ", currentSnake)
+	// assume the first index of array is the head
+	if (direction === 0) {return}
+	//94 + 10 = 104
+	// out of bound
+	currentSnake.forEach((val, idx) => {
+		if (val + direction >= Math.pow(width, 2) && direction === width) {
+			currentSnake[idx] = (val + width) % Math.pow(width, 2)
+		} else if (val + direction < 0 && direction === -width){
+			currentSnake[idx] = (val % width) + (Math.pow(width, 2) - width)
+		} else if ((val % width) + direction >= width && direction === 1){
+			currentSnake[idx] = val - (val % width)
+		} else if ((val % width) + direction < 0  && direction === -1){
+			currentSnake[idx] = val + width - 1
+		}
+	})
+	let tail = currentSnake.pop();
+	pointList[tail].classList.remove("snake");
+	currentSnake.unshift(currentSnake[0] + direction);
+	pointList[currentSnake[0]].classList.add("snake");
+	
+
+	eatApple(pointList, tail)
+	console.log("current pos: ", currentSnake)
 }
 
 function generateRandomApple(squares) {
@@ -105,20 +122,20 @@ function generateRandomApple(squares) {
 }
 
 function removeEatenApple(squares){
-    squares[appleIndex].classList.remove("apple");
+	squares[appleIndex].classList.remove("apple");
 }
 
 function control(e) {
-    console.log("key pressed: ", e);
-    if (e.code === "ArrowRight") {
-      direction = 1; // right
-    } else if (e.code === "ArrowUp") {
-      direction = -width; // arrow up
-    } else if (e.code === "ArrowLeft") {
-      direction = -1; // left, the snake will go left one div
-    } else if (e.code === "ArrowDown") {
-      direction = +width; // down the snake head will instantly appear 10 divs below from the current div
-    } else if (e.key === "Escape") {
-        direction = 0;
-    }
-  }
+	console.log("key pressed: ", e);
+	if (e.code === "ArrowRight") {
+		direction = 1; // right
+	} else if (e.code === "ArrowUp") {
+		direction = -width; // arrow up
+	} else if (e.code === "ArrowLeft") {
+		direction = -1; // left, the snake will go left one div
+	} else if (e.code === "ArrowDown") {
+		direction = +width; // down the snake head will instantly appear 10 divs below from the current div
+	} else if (e.key === "Escape") {
+			direction = 0;
+	}
+}
