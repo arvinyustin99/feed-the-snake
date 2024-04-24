@@ -48,6 +48,7 @@ function createBoard(width) {
 function moveOutcome() {
 	let squares = document.querySelectorAll("#root .canvas div")
 	moveSnake(squares)
+	drawCanvas(squares, currentSnake, appleIndex)
 }
 
 function eatApple(squares, tail) {
@@ -64,6 +65,15 @@ function eatApple(squares, tail) {
 	}
 }
 
+function drawCanvas(canvas, playerPos, foodPos){
+	canvas.forEach((val, idx) => {
+		canvas[idx].classList.remove("snake");
+	})
+	playerPos.forEach((val, idx) => {
+		canvas[val].classList.add("snake");
+	})
+}
+
 function checkForHits(squares) {
 	if (
 		(currentSnake[0] + width >= width * width && direction === width) ||
@@ -78,32 +88,43 @@ function checkForHits(squares) {
 	}
 }
 
-function outOfBound(squares){
+function head(snake){
+	return snake[0]
 }
 
 function moveSnake(pointList) {
 	// assume the first index of array is the head
 	if (direction === 0) {return}
-	//94 + 10 = 104
-	// out of bound
-	currentSnake.forEach((val, idx) => {
-		if (val + direction >= Math.pow(width, 2) && direction === width) {
-			currentSnake[idx] = (val + width) % Math.pow(width, 2)
-		} else if (val + direction < 0 && direction === -width){
-			currentSnake[idx] = (val % width) + (Math.pow(width, 2) - width)
-		} else if ((val % width) + direction >= width && direction === 1){
-			currentSnake[idx] = val - (val % width)
-		} else if ((val % width) + direction < 0  && direction === -1){
-			currentSnake[idx] = val + width - 1
+
+	let prevPos = currentSnake[0];
+	for (let i = 0; i < currentSnake.length; i += 1){
+		if (i === 0) {//head
+			let val = currentSnake[i]
+			if (val + direction >= Math.pow(width, 2) && direction === width) {
+				currentSnake[i] = (val + width) % Math.pow(width, 2)
+			} else if (val + direction < 0 && direction === -width){
+				currentSnake[i] = (val % width) + (Math.pow(width, 2) - width)
+			} else if ((val % width) + direction >= width && direction === 1){
+				currentSnake[i] = val - (val % width)
+			} else if ((val % width) + direction < 0  && direction === -1){
+				currentSnake[i] = val + width - 1
+			} else {
+				currentSnake[i] += direction
+			}
+			continue
 		}
-	})
-	let tail = currentSnake.pop();
-	pointList[tail].classList.remove("snake");
-	currentSnake.unshift(currentSnake[0] + direction);
-	pointList[currentSnake[0]].classList.add("snake");
+		temp = currentSnake[i]
+		currentSnake[i] = prevPos
+		prevPos = temp
+
+	}
+	//let tail = currentSnake.pop();
+	//pointList[tail].classList.remove("snake");
+	//currentSnake.unshift(currentSnake[0] + direction);
+	//pointList[currentSnake[0]].classList.add("snake");
 	
 
-	eatApple(pointList, tail)
+	//eatApple(pointList, tail)
 	console.log("current pos: ", currentSnake)
 }
 
