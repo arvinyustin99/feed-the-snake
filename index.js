@@ -51,14 +51,10 @@ function moveOutcome() {
 	drawCanvas(squares, currentSnake, appleIndex)
 }
 
-function eatApple(squares, tail) {
-	if (squares[currentSnake[0]].classList.contains("apple")) {
-		squares[currentSnake[0]].classList.remove("apple");
-		squares[tail].classList.add("snake");
-		currentSnake.push(tail);
-		generateRandomApple(squares);
-		//score++;
-		//scoreDisplay.textContent = score;
+function eatApple(pointList) {
+	if (head(currentSnake) === appleIndex) {
+		currentSnake.push(0)
+		generateRandomApple(pointList)
 		clearInterval(interval);
 		intervalTime = intervalTime * speed;
 		interval = setInterval(moveOutcome, intervalTime);
@@ -91,6 +87,9 @@ function checkForHits(squares) {
 function head(snake){
 	return snake[0]
 }
+function tail(snake){
+	return snake[snake.length-1]
+}
 
 function moveSnake(pointList) {
 	// assume the first index of array is the head
@@ -113,18 +112,13 @@ function moveSnake(pointList) {
 			}
 			continue
 		}
+		//swap
 		temp = currentSnake[i]
 		currentSnake[i] = prevPos
 		prevPos = temp
-
 	}
-	//let tail = currentSnake.pop();
-	//pointList[tail].classList.remove("snake");
-	//currentSnake.unshift(currentSnake[0] + direction);
-	//pointList[currentSnake[0]].classList.add("snake");
 	
-
-	//eatApple(pointList, tail)
+	eatApple(pointList)
 	console.log("current pos: ", currentSnake)
 }
 
